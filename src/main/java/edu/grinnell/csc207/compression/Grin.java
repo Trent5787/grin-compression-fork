@@ -1,5 +1,8 @@
 package edu.grinnell.csc207.compression;
 
+import java.io.IOException;
+import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.Map;
 
 /**
@@ -19,13 +22,33 @@ public class Grin {
     /**
      * Creates a mapping from 8-bit sequences to number-of-occurrences of
      * those sequences in the given file. To do this, read the file using a
-     * BitInputStream, consuming 8 bits at a time.
+     * BitInputStream, consuming 8 bits at a time. 
      * @param file the file to read
      * @return a freqency map for the given file
      */
-    public static Map<Short, Integer> createFrequencyMap (String file) {
-        // TODO: fill me in!
-        return null;
+    public static Map<Short, Integer> createFrequencyMap (String file) throws IOException, Exception {
+        BitInputStream bitStream = new BitInputStream(file);
+        ArrayList<Short> intArr = new ArrayList<>();
+        HashMap<Short, Integer> freqMap = new HashMap<>();
+        
+        //populate arrayList with int representation of bits in file
+        while (bitStream.hasBits()) {
+           int bitChunk = bitStream.readBits(8); 
+           if (bitChunk == -1) {
+               throw new Exception("Stream ran out of data");
+           }
+           intArr.add((short)bitChunk);
+        }
+        //populate frequencyMap with frequencies of ints in the arrayList.
+        for(int i = 0; i < intArr.size(); i++) {
+            if(freqMap.containsKey(intArr.get(i))) {
+                int value = freqMap.get(intArr.get(i));
+                freqMap.put(intArr.get(i),value+1);
+            } else {
+                freqMap.put(intArr.get(i), 1);
+            }
+        }
+        return freqMap;
     }
 
     /**
